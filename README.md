@@ -9,7 +9,7 @@ TCP Brutal is [Hysteria](https://hysteria.network/)'s congestion control algorit
 Installation script:
 
 ```bash
-bash <(curl -fsSL https://tcp.hy2.sh/)
+bash <(curl -fsSL https://fastly.jsdelivr.net/gh/mkr-0920/tcp-brutal@master/scripts/install_dkms.sh)
 ```
 
 Manual compilation and loading:

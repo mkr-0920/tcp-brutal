@@ -7,7 +7,7 @@ TCP Brutal 是 [Hysteria](https://hysteria.network/) 中的同名拥塞控制算
 安装脚本：
 
 ```bash
-bash <(curl -fsSL https://tcp.hy2.sh/)
+bash <(curl -fsSL https://fastly.jsdelivr.net/gh/mkr-0920/tcp-brutal@master/scripts/install_dkms.sh)
 ```
 
 手动编译并加载：

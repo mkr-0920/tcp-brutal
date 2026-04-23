@@ -19,11 +19,11 @@ SCRIPT_ARGS=("$@")
 
 # Initial URL & command of one-click script (for usage & logging)
 # TODO: change the link to real
-SCRIPT_INITIATOR_URL="https://tcp.hy2.sh"
+SCRIPT_INITIATOR_URL="https://raw.githubusercontent.com/mkr-0920/tcp-brutal/master/scripts/install_dkms.sh"
 SCRIPT_INITIATOR_COMMAND="bash <(curl -fsSL $SCRIPT_INITIATOR_URL)"
 
 # URL of GitHub
-REPO_URL="https://github.com/apernet/tcp-brutal"
+REPO_URL="https://github.com/mkr-0920/tcp-brutal"
 
 # URL of Hysteria 2 API
 HY2_API_BASE_URL="https://api.hy2.io/v1"
@@ -668,12 +668,12 @@ get_latest_version() {
   fi
 
   local _tmpfile=$(mktemp)
-  if ! curl -sS "$HY2_API_BASE_URL/update?cver=installscript&arch=generic&plat=linux&chan=tcp-brutal" -o "$_tmpfile"; then
-    error "Failed to get the latest version from Hysteria 2 API, please check your network and try again."
+  if ! curl -sS "https://api.github.com/repos/mkr-0920/tcp-brutal/releases/latest" -o "$_tmpfile"; then
+    error "Failed to get the latest version from GitHub API, please check your network and try again."
     exit 11
   fi
 
-  local _latest_version=$(grep -oP '"lver":\s*\K"v.*?"' "$_tmpfile" | head -1)
+  local _latest_version=$(grep -oP '"tag_name":\s*\K"v.*?"' "$_tmpfile" | head -1)
   _latest_version=${_latest_version#'"'}
   _latest_version=${_latest_version%'"'}
 
