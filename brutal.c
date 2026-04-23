@@ -37,19 +37,19 @@
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 13, 0)
 static u64 tcp_sock_get_sec(const struct tcp_sock *tp)
 {
-    return div_u64(tp->tcp_mstamp, USEC_PER_SEC);
+    return tp->tcp_mstamp >> 20;
 }
 #elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0)
 // see https://github.com/torvalds/linux/commit/9a568de4818dea9a05af141046bd3e589245ab83
 static u64 tcp_sock_get_sec(const struct tcp_sock *tp)
 {
-    return div_u64(tp->tcp_mstamp.stamp_us, USEC_PER_SEC);
+    return tp->tcp_mstamp.stamp_us >> 20;
 }
 #else
 #include <linux/jiffies.h>
 static u64 tcp_sock_get_sec(const struct tcp_sock *tp)
 {
-    return div_u64(jiffies_to_usecs(tcp_time_stamp), USEC_PER_SEC);
+    return ((u64)jiffies_to_usecs(tcp_time_stamp)) >> 20;
 }
 #endif
 
@@ -217,12 +217,9 @@ static void brutal_update_rate(struct sock *sk)
     rate *= 100;
     rate = div_u64(rate, ack_rate);
 
-    // The order here is chosen carefully to avoid overflow as much as possible
-    cwnd = div_u64(rate, MSEC_PER_SEC);
-    cwnd *= rtt_ms;
-    cwnd /= mss;
-    cwnd *= brutal->cwnd_gain;
-    cwnd /= 10;
+    // Combine divisions to minimize truncation errors and optimize CPU usage
+    u64 tmp = rate * rtt_ms * brutal->cwnd_gain;
+    cwnd = div_u64(tmp, (u32)mss * 10000);
     cwnd = max_t(u32, cwnd, MIN_CWND);
 
     brutal_tcp_snd_cwnd_set(tp, min(cwnd, tp->snd_cwnd_clamp));
